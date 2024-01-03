@@ -60,10 +60,10 @@ rustPlatform.buildRustPackage rec {
   cargoSha256 = "sha256-2nV1o86JaCNPayt/Pa+pcMIVkvpfznc1P/5Wlfr8xmc=";
 
   meta = {
-    description = "Automate starting binary exploit challenges";
-    homepage = "https://github.com/io12/pwninit";
+    description = "radius2 is a fast binary emulation and symbolic execution framework using radare2";
+    homepage = "https://github.com/aemmitt-ns/radius";
     license = lib.licenses.mit;
-    maintainers = [ lib.maintainers.scoder12 ];
+    maintainers = [  ];
     platforms = lib.platforms.all;
   };
 }
