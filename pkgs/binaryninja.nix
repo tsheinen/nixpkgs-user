@@ -1,50 +1,34 @@
-{ stdenv
-, glib
-, libglvnd
-, xorg
-, fontconfig
-, dbus
-, autoPatchelfHook
-, requireFile
-, unzip
-, wayland
-# , wrapQtAppsHook
-, qt6
-, zlib
-, makeDesktopItem
-, python3
-, lib
-, makeWrapper
-}:
+{ stdenv, glib, libglvnd, xorg, fontconfig, dbus, autoPatchelfHook, requireFile
+, unzip, wayland, qt6, zlib, makeDesktopItem, python3, lib, makeWrapper }:
 
 stdenv.mkDerivation rec {
-    pname = "binaryninja";
-    version = "3.5.5526";
-    description = "Binary Ninja: A Reverse Engineering Platform";
+  pname = "binaryninja";
+  version = "3.5.5526";
+  description = "Binary Ninja: A Reverse Engineering Platform";
 
-    src = requireFile {
-        name = "BinaryNinja-personal.zip";
-        sha256 = "c21e7959169b3a83780326e3cbfce4c915dc657c6e5a237b96650284bd83210d";
-        message = ''
-            Binary Ninja is commercial software, add BinaryNinja-personal.zip to the nix store with nix-prefetch-url file://$PWD/BinaryNinja-personal.zip
-            You can recover this zip file with a licensed email athttps://binary.ninja/recover/
-        '';
-    };
-
-    unpackPhase = ''
-    ${unzip}/bin/unzip $src
+  src = requireFile {
+    name = "BinaryNinja-personal.zip";
+    sha256 = "0rzidb8iyaa9vcc84rgg9455myxwpi0px3sh7zdkiq0vgzysjilc";
+    message = ''
+      Binary Ninja is commercial software, add BinaryNinja-personal.zip to the nix store with nix-prefetch-url file://$PWD/BinaryNinja-personal.zip
+      You can recover this zip file with a licensed email athttps://binary.ninja/recover/
     '';
+  };
 
-    desktop = makeDesktopItem {
-        name = "Binary Ninja Personal";
-        exec = "binaryninja";
-        icon = pname;
-        comment = description;
-        desktopName = "Binary Ninja Personal";
-        categories = [ "Utility" ];
-    };
+  unpackPhase = ''
+    ${unzip}/bin/unzip $src
+  '';
 
-    installPhase = ''
+  desktop = makeDesktopItem {
+    name = "Binary Ninja Personal";
+    exec = "binaryninja";
+    icon = pname;
+    comment = description;
+    desktopName = "Binary Ninja Personal";
+    categories = [ "Utility" ];
+  };
+
+  installPhase = ''
     mkdir -p $out/bin
     mkdir -p $out/share/icons
     cp -r binaryninja $out
@@ -52,40 +36,41 @@ stdenv.mkDerivation rec {
     ln -s $out/binaryninja/binaryninja $out/bin/binaryninja
     ln -s $out/binaryninja/docs/img/logo.png $out/share/icons/binaryninja.png
     ln -s "$desktop/share/applications" $out/share/
-    '';
+  '';
 
-    postFixup = ''
-	    wrapProgram $out/bin/binaryninja --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ python3 ]}
-    '';
+  postFixup = ''
+    wrapProgram $out/bin/binaryninja --prefix LD_LIBRARY_PATH : ${
+      lib.makeLibraryPath [ python3 ]
+    }
+  '';
 
+  dontWrapQtApps = true;
 
-    dontWrapQtApps = true;
+  nativeBuildInputs = [ autoPatchelfHook makeWrapper ];
+  buildInputs = [
+    stdenv.cc.cc
+    glib # libglib-2.0.so.0
+    fontconfig # libfontconfig.so.1
+    dbus # libdbus-1.so.3
+    libglvnd # libGL.so.1
+    xorg.libX11 # libX11.so.6
+    xorg.libXi # libXi.so.6
+    xorg.libXrender # libXrender.so.1
+    wayland # libwayland.so.0
+    qt6.qtbase # Everything Qt6
+    zlib # libz.so.1
+    stdenv.cc.cc.lib # libstdc++.so.6
+    qt6.qtdeclarative # libQt6Qml.so.6
+    qt6.qtwayland # libQt6WaylandClient.so.6
+  ];
+  runtimeDependencies = [
+    python3 # libpython.so
+  ];
 
-    nativeBuildInputs = [ autoPatchelfHook makeWrapper ];
-    buildInputs = [
-        stdenv.cc.cc
-        glib # libglib-2.0.so.0
-        fontconfig # libfontconfig.so.1
-        dbus # libdbus-1.so.3
-        libglvnd # libGL.so.1
-        xorg.libX11 # libX11.so.6
-        xorg.libXi # libXi.so.6
-        xorg.libXrender # libXrender.so.1
-        wayland # libwayland.so.0
-        qt6.qtbase # Everything Qt6
-        zlib # libz.so.1
-        stdenv.cc.cc.lib # libstdc++.so.6
-        qt6.qtdeclarative # libQt6Qml.so.6 
-        qt6.qtwayland # libQt6WaylandClient.so.6
-    ];
-    runtimeDependencies = [
-        python3 # libpython.so
-    ];
-
-    meta = {
-        homepage = "https://binary.ninja/";
-        description = description;
-        platforms = [ "x86_64-linux" ];
-        maintainers = [ "Thea Heinen <theinen@protonmail.com>" ];
-    };
+  meta = {
+    homepage = "https://binary.ninja/";
+    description = description;
+    platforms = [ "x86_64-linux" ];
+    maintainers = [ "Thea Heinen <theinen@protonmail.com>" ];
+  };
 }
