@@ -8,6 +8,8 @@
       radius2 = prev.pkgs.callPackage ./pkgs/radius2.nix { };
       signal-desktop-twitter =
         prev.pkgs.callPackage ./pkgs/signal-desktop-twitter.nix { };
+      pokemon-colorscripts =
+          prev.pkgs.callPackage ./pkgs/pokemon-colorscripts.nix { };
     };
 
     packages.x86_64-linux =
@@ -17,6 +19,8 @@
         radius2 = pkgs.callPackage ./pkgs/radius2.nix { };
         signal-desktop-twitter =
           pkgs.callPackage ./pkgs/signal-desktop-twitter.nix { };
+        pokemon-colorscripts =
+          pkgs.callPackage ./pkgs/pokemon-colorscripts.nix { };
       };
 
   };
